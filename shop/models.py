@@ -71,12 +71,19 @@ class CustomerProfile(models.Model):
 
 
 class Address(models.Model):
+    ADDRESS_TYPE_CHOICES = (
+        ('Home', 'Home'),
+        ('Work', 'Work'),
+        ('Other', 'Other'),
+    )
     customer = models.ForeignKey("CustomerProfile", on_delete=models.CASCADE, related_name="addresses")
     address_line = models.TextField()
     city = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
-    is_default = models.BooleanField(default=False)  # ✅ allows marking one default address
+    address_type = models.CharField(max_length=20, choices=ADDRESS_TYPE_CHOICES, default='Home')
+    is_default = models.BooleanField(default=False) 
+    
 
     def __str__(self):
         return f"{self.customer.customer_id} - {self.address_line[:30]}"

@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Address{% endblock %}
+
+{% block content %}
+<style>
+    /* Global Styles */
+
+
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 1200%;
+        max-width: 1000px;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    /* Header & Navigation */
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        text-align: left; /* Aligns title to the left */
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 0;
+        position: relative;
+        flex-grow: 1; /* Allows the title to take up remaining space */
+    }
+
+    h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0; /* Aligns the underline to the left */
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+
+    .nav-link {
+        padding: 10px 20px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(102, 126, 234, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .required {
+        color: #e74c3c;
+    }
+
+    .btn-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #666;
+        border: 2px solid #e1e5e9;
+    }
+
+    .btn-secondary:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    .address-type {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .radio-group input[type="radio"],
+    .radio-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #667eea;
+        vertical-align: middle;
+    }
+
+    .radio-group label {
+        margin: 0;
+        font-weight: normal;
+        text-transform: none;
+        letter-spacing: normal;
+        vertical-align: middle;
+    }
+
+    /* Message Banners */
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #c3e6cb;
+        display: none;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 600px) {
+        .container {
+            padding: 30px 20px;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+        }
+        
+        .btn-container {
+            flex-direction: column;
+        }
+        
+        .address-type {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="header-content">
+        <h1>{% if address %}Edit{% else %}Add{% endif %} Customer Address</h1>
+        <a href="#" class="nav-link">View All Addresses</a>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}" style="display: block;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="success-message" id="successMessage">
+        Address information saved successfully!
+    </div>
+
+    <form method="post" id="addressForm">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Address Type</label>
+            <div class="address-type">
+                <div class="radio-group">
+                    <input type="radio" id="home" name="address_type" value="Home" 
+                            {% if not address or address.address_type == 'Home' %}checked{% endif %}>
+                    <label for="home">Home</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" id="work" name="address_type" value="Work"
+                            {% if address.address_type == 'Work' %}checked{% endif %}>
+                    <label for="work">Work</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" id="other" name="address_type" value="Other"
+                            {% if address.address_type == 'Other' %}checked{% endif %}>
+                    <label for="other">Other</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="customer">Customer <span class="required">*</span></label>
+            {% if customers %}
+            <select id="customer" name="customer" class="form-control" required {% if address %}disabled{% endif %}>
+                <option value="" disabled {% if not address %}selected{% endif %}>Select a Customer</option>
+                {% for customer in customers %}
+                    <option value="{{ customer.id }}" 
+                            data-email="{{ customer.customer_email|default:'' }}"
+                            data-phone="{{ customer.phone_number|default:'' }}"
+                            {% if address and address.customer.id == customer.id %}selected{% endif %}>
+                        {{ customer.customer_name }} ({{ customer.customer_email|default:'No email' }})
+                    </option>
+                {% endfor %}
+            </select>
+            {% if address %}
+                <input type="hidden" name="customer" value="{{ address.customer.id }}">
+            {% endif %}
+            {% else %}
+            <input type="text" class="form-control" value="No customers found. Please create a customer profile first." disabled>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
+                <a href="#" style="color: #667eea;">Create Customer Profile</a>
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="addressLine">Address Line <span class="required">*</span></label>
+            <textarea id="addressLine" name="address_line" placeholder="Complete address including street, area, landmarks" required rows="3">{% if address %}{{ address.address_line }}{% endif %}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="city">City <span class="required">*</span></label>
+                <input type="text" id="city" name="city" value="{% if address %}{{ address.city }}{% endif %}" required>
+            </div>
+            <div class="form-group">
+                <label for="postalCode">Postal Code <span class="required">*</span></label>
+                <input type="text" id="postalCode" name="postal_code" value="{% if address %}{{ address.postal_code }}{% endif %}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Country <span class="required">*</span></label>
+            <select id="country" name="country" class="form-control" required>
+                <option value="">Select Country</option>
+                <option value="India" {% if not address or address.country == 'India' %}selected{% endif %}>India</option>
+                <option value="United States" {% if address.country == 'United States' %}selected{% endif %}>United States</option>
+                <option value="Canada" {% if address.country == 'Canada' %}selected{% endif %}>Canada</option>
+                <option value="United Kingdom" {% if address.country == 'United Kingdom' %}selected{% endif %}>United Kingdom</option>
+                <option value="Australia" {% if address.country == 'Australia' %}selected{% endif %}>Australia</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <div class="radio-group">
+                <input type="checkbox" id="isDefault" name="is_default" value="true" 
+                        {% if address.is_default %}checked{% endif %}>
+                <label for="isDefault">Set as default address</label>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="#" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                {% if address %}Update Address{% else %}Save Address{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Existing script remains the same
+</script>
+{% endblock %}
