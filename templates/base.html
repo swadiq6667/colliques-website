@@ -412,81 +412,79 @@
             </li>
 
             <li class="sidebar-item">
-                <a href="{% url 'Address' %}" class="sidebar-link">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Customers Address</span>
+                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sales</span>
                 </a>
-            </li>   
-            
+                <ul class="submenu" id="orders-menu">
+                    <li><a href="{#}" class="sidebar-link">Orders</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="products">
+                    <i class="fas fa-box"></i>
+                    <span>Catalog</span>
+                </a>
+                <ul class="submenu" id="products-menu">
+                    <li><a href="{#}" class="sidebar-link">Products</a></li>
+                    <li><a href="{#}" class="sidebar-link">Categories</a></li>
+                </ul>
+            </li>
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link dropdown-toggle" data-toggle="users">
                     <i class="fas fa-users"></i>
                     <span>Customers</span>
-                    <i class="fas fa-chevron-down"></i>
                 </a>
                 <ul class="submenu" id="users-menu">
                     <li><a href="{#}" class="sidebar-link">List Customers</a></li>
                     <li><a href="{#}" class="sidebar-link">Add Customer</a></li>
+                    <li><a href="{% url 'Address' %}" class="sidebar-link">Customer Address</a></li>
                 </ul>
             </li>
-            
             <li class="sidebar-item">
-                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="products">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                    <i class="fas fa-chevron-down"></i>
+                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="marketing">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span>Marketing</span>
                 </a>
-                <ul class="submenu" id="products-menu">
-                    <li><a href="{#}" class="sidebar-link">List Products</a></li>
-                    <li><a href="{#}" class="sidebar-link">Add Product</a></li>
-                    <li><a href="{#}" class="sidebar-link">Product Variants</a></li>
+                <ul class="submenu" id="marketing-menu">
+                    <li><a href="{#}" class="sidebar-link">Cart Price Rules</a></li>
                 </ul>
             </li>
-            
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link dropdown-toggle" data-toggle="categories">
                     <i class="fas fa-tags"></i>
-                    <span>Categories</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <span>Content</span>
                 </a>
                 <ul class="submenu" id="categories-menu">
-                    <li><a href="{#}" class="sidebar-link">List Categories</a></li>
-                    <li><a href="{#}" class="sidebar-link">Add Category</a></li>
+                    <li><a href="{#}" class="sidebar-link">Pages</a></li>
+                    <li><a href="{#}" class="sidebar-link">Blocks</a></li>
                 </ul>
-            </li>
-            
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="orders">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                    <i class="fas fa-chevron-down"></i>
-                </a>
-                <ul class="submenu" id="orders-menu">
-                    <li><a href="{#}" class="sidebar-link">All Orders</a></li>
-                    <li><a href="{#}" class="sidebar-link">Pending Orders</a></li>
-                    <li><a href="{#}" class="sidebar-link">Completed Orders</a></li>
-                </ul>
-            </li>
-            
-            <li class="sidebar-item">
-                <a href="{#}" class="sidebar-link">
-                    <i class="fas fa-shopping-basket"></i>
-                    <span>Cart Overview</span>
-                </a>
-            </li>
-            
+            </li> 
             <li class="sidebar-item">
                 <a href="{#}" class="sidebar-link">
                     <i class="fas fa-chart-line"></i>
                     <span>Reports & Analytics</span>
                 </a>
             </li>
-            
             <li class="sidebar-item">
-                <a href="{#}" class="sidebar-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
+                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="stores">
+                    <i class="fas fa-store"></i>
+                    <span>Stores</span>
                 </a>
+                <ul class="submenu" id="stores-menu">
+                    <li><a href="{#}" class="sidebar-link">Configuration</a></li>
+                    <li><a href="{#}" class="sidebar-link">Product</a></li>
+                    <li><a href="{#}" class="sidebar-link">Attribute Set</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link dropdown-toggle" data-toggle="system">
+                    <i class="fas fa-cog"></i>
+                    <span>System</span>
+                </a>
+                <ul class="submenu" id="system-menu">
+                    <li><a href="{#}" class="sidebar-link">Import</a></li>
+                    <li><a href="{#}" class="sidebar-link">Export</a></li>
             </li>
         </ul>
     </nav>
