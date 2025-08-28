@@ -218,7 +218,25 @@
             border-radius: 50%;
             transition: background-color 0.3s ease;
         }
-
+        .bill-btn {
+            background: #2563eb;
+            color: white;
+            text-decoration: none; /* remove underline */
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s ease;
+        }
+        .bill-btn:hover {
+            background: #1e40af;
+            transform: scale(1.05);
+        }
         .notification-btn:hover {
             background-color: #f8f9fa;
         }
@@ -488,6 +506,7 @@
             </li>
         </ul>
     </nav>
+    
 
     <!-- Top Navbar -->
     <header class="top-navbar">
@@ -507,6 +526,10 @@
                 <i class="fas fa-bell"></i>
                 <span class="notification-badge">3</span>
             </button>
+
+            <a href="{% url 'billing' %}" class="bill-btn">
+                <i class="fas fa-file-invoice-dollar"></i> Generate Bill
+              </a>
             
             <div class="user-dropdown">
                 <div class="user-info" data-bs-toggle="dropdown">

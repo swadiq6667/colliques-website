@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Billing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 90%;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        input, select {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        .remove-btn {
+            background-color: #ef4444;
+        }
+        .remove-btn:hover {
+            background-color: #dc2626;
+        }
+        /* Style for the custom alert message */
+        .custom-alert {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: #4f46e5;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: fadeInOut 4s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body > *:not(.print-container) {
+                display: none;
+            }
+            .print-container {
+                display: block;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Shop Billing System</h1>
+
+    <!-- Custom Alert Message Display -->
+    <div id="custom-alert" class="hidden"></div>
+
+    <!-- 🔎 Customer Lookup -->
+    <h2 class="text-2xl">🔎 Customer Lookup</h2>
+    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+        <input type="text" id="phone" placeholder="Enter Phone Number" class="flex-grow">
+        <button onclick="lookupCustomer()" class="w-full sm:w-auto">Search</button>
+    </div>
+    <div id="customerInfo" class="p-4 bg-gray-100 rounded-lg text-gray-700"></div>
+
+    <!-- 🛒 Add Items -->
+    <h2 class="text-2xl">🛒 Add Items</h2>
+    <div class="overflow-x-auto">
+        <table id="itemsTable" class="min-w-full bg-white shadow-sm rounded-lg">
+            <thead>
+                <tr>
+                    <th class="py-3 px-4">Category</th>
+                    <th class="py-3 px-4">Product</th>
+                    <th class="py-3 px-4">Variant</th>
+                    <th class="py-3 px-4">Quantity</th>
+                    <th class="py-3 px-4">Price</th>
+                    <th class="py-3 px-4">Subtotal</th>
+                    <th class="py-3 px-4">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <button onclick="addRow()" class="mt-4">+ Add Item</button>
+
+    <div class="mt-6 p-4 bg-gray-100 rounded-lg shadow-inner">
+        <h3 class="text-lg font-bold">Total: ₹<span id="totalAmount">0</span></h3>
+        <label class="block mt-2">
+            Discount: ₹
+            <input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" class="w-32">
+        </label>
+        <br>
+        <label class="block mt-2">
+            Payment Method:
+            <select id="paymentMethod" class="w-32">
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="card">Card</option>
+            </select>
+        </label>
+        <br>
+        <button onclick="submitBill()" class="mt-4">✅ Save Bill</button>
+        <button onclick="printBill()" class="mt-4">🖨️ Print Bill</button>
+    </div>
+
+    <!-- 📜 Customer History -->
+    <h2 class="text-2xl">📜 Customer History</h2>
+    <div id="history" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-700"></div>
+</div>
+
+<script>
+    let customerId = null;
+
+    // Helper function to show a custom message instead of alert()
+    function showMessage(message) {
+        const alertDiv = document.getElementById("custom-alert");
+        alertDiv.innerText = message;
+        alertDiv.classList.remove("hidden");
+        setTimeout(() => {
+            alertDiv.classList.add("hidden");
+        }, 3000);
+    }
+
+    // 1️⃣ Lookup Customer
+    function lookupCustomer() {
+        const phone = document.getElementById("phone").value;
+        fetch(window.location.origin + `/customer-lookup/?phone=${phone}`)
+            .then(res => res.json())
+            .then(data => {
+                const customerInfoDiv = document.getElementById("customerInfo");
+                if (data.exists) {
+                    customerId = data.id;
+                    customerInfoDiv.innerHTML =
+                        `Customer Found: <b>${data.name}</b> (${data.email || "No Email"})`;
+                    loadHistory();
+                } else {
+                    customerId = null;
+                    customerInfoDiv.innerHTML =
+                        "❌ No customer found. Please register manually.";
+                    document.getElementById("history").innerHTML = "";
+                }
+            });
+    }
+
+    // 2️⃣ Add new item row
+    function addRow() {
+        const table = document.querySelector("#itemsTable tbody");
+        const row = table.insertRow();
+        row.innerHTML = `
+            <td class="py-2 px-4">
+                <select class="category" onchange="loadProducts(this)">
+                    <option value="">Select Category</option>
+                </select>
+            </td>
+            <td class="py-2 px-4">
+                <select class="product" onchange="loadVariants(this)">
+                    <option value="">Select Product</option>
+                </select>
+            </td>
+            <td class="py-2 px-4">
+                <select class="variant" onchange="updatePrice(this)">
+                    <option value="">Select Variant</option>
+                </select>
+            </td>
+            <td class="py-2 px-4"><input type="number" value="1" onchange="updateTotal()" class="w-20"></td>
+            <td class="py-2 px-4"><input type="number" value="0" step="0.01" onchange="updateTotal()" class="w-24"></td>
+            <td class="subtotal py-2 px-4">0</td>
+            <td class="py-2 px-4"><button onclick="removeRow(this)" class="remove-btn text-sm px-2 py-1">❌</button></td>
+        `;
+
+        // Load categories via API
+        fetch(window.location.origin + "/api/categories/")
+            .then(res => res.json())
+            .then(data => {
+                const categorySelect = row.querySelector(".category");
+                data.forEach(cat => {
+                    categorySelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            });
+    }
+
+    // 3️⃣ Load products for selected category
+    function loadProducts(select) {
+        const categoryId = select.value;
+        const row = select.closest("tr");
+        const productSelect = row.querySelector(".product");
+        const variantSelect = row.querySelector(".variant");
+
+        productSelect.innerHTML = `<option value="">Select Product</option>`;
+        variantSelect.innerHTML = `<option value="">Select Variant</option>`;
+
+        if (!categoryId) return;
+
+        fetch(window.location.origin + `/api/products/?category=${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(prod => {
+                    productSelect.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
+                });
+            });
+    }
+
+    // 4️⃣ Load variants for selected product
+    function loadVariants(select) {
+        const productId = select.value;
+        const row = select.closest("tr");
+        const variantSelect = row.querySelector(".variant");
+
+        variantSelect.innerHTML = `<option value="">Select Variant</option>`;
+
+        if (!productId) return;
+
+        fetch(window.location.origin + `/api/variants/?product=${productId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(variant => {
+                    variantSelect.innerHTML += `<option value="${variant.id}" data-price="${variant.price}">${variant.color} - ${variant.size} (₹${variant.price})</option>`;
+                });
+            });
+    }
+
+    // 5️⃣ Auto-fill price when variant selected
+    function updatePrice(variantSelect) {
+        const row = variantSelect.closest("tr");
+        const priceInput = row.cells[4].children[0]; // price column
+        const selectedOption = variantSelect.selectedOptions[0];
+        priceInput.value = selectedOption.dataset.price || 0;
+        updateTotal();
+    }
+
+    // 6️⃣ Remove row
+    function removeRow(btn) {
+        btn.parentNode.parentNode.remove();
+        updateTotal();
+    }
+
+    // 7️⃣ Update total amount
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
+            const qty = parseInt(row.cells[3].children[0].value) || 0;
+            const price = parseFloat(row.cells[4].children[0].value) || 0;
+            const subtotal = qty * price;
+            row.querySelector(".subtotal").innerText = subtotal;
+            total += subtotal;
+        });
+
+        const discount = parseFloat(document.getElementById("discount").value) || 0;
+        total -= discount; // subtract discount
+        if (total < 0) total = 0; // prevent negative total
+        document.getElementById("totalAmount").innerText = total.toFixed(2);
+    }
+
+    // 8️⃣ Submit bill
+    function submitBill() {
+        if (!customerId) {
+            showMessage("Select a customer first!");
+            return;
+        }
+        let items = [];
+        document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
+            const variantId = row.querySelector(".variant").value || null;
+            const productId = row.querySelector(".product").value;
+            const qty = row.cells[3].children[0].value;
+            const price = row.cells[4].children[0].value;
+
+            if (!productId || !qty || !price) return;
+
+            items.push({
+                product_id: productId,
+                variant_id: variantId,
+                quantity: qty,
+                price: price
+            });
+        });
+
+        if (items.length === 0) {
+            showMessage("Add at least one item to the bill!");
+            return;
+        }
+
+        const payload = {
+            customer_id: customerId,
+            payment_method: document.getElementById("paymentMethod").value,
+            discount: parseFloat(document.getElementById("discount").value) || 0,
+            items: items
+        };
+
+        fetch(window.location.origin + "/create-bill/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            showMessage(`✅ Bill Saved! ID: ${data.bill_id} | Total: ₹${data.total_amount.toFixed(2)}`);
+            loadHistory();
+            document.querySelector("#itemsTable tbody").innerHTML = "";
+            document.getElementById("totalAmount").innerText = "0";
+            document.getElementById("discount").value = "0";
+        });
+    }
+
+    // 9️⃣ Load customer history
+    function loadHistory() {
+        fetch(window.location.origin + `/customer-history/${customerId}/`)
+            .then(res => res.json())
+            .then(data => {
+                let html = `
+                    <p class="font-bold">Total Visits: <span class="font-normal">${data.total_visits}</span></p>
+                    <p class="font-bold">Total Spent: <span class="font-normal">₹${data.total_spent.toFixed(2)}</span></p>
+                    <h4 class="font-bold mt-4">Recent Bills:</h4>
+                    <ul class="list-disc list-inside">
+                `;
+                data.bills.forEach(bill => {
+                    html += `
+                        <li class="mt-2">
+                            Bill #${bill.bill_id} | Date: ${bill.date} | Total: ₹${bill.total.toFixed(2)}
+                            <ul class="list-circle list-inside ml-4">
+                                ${bill.items.map(i => `<li>${i.product} (${i.quantity} × ₹${parseFloat(i.price).toFixed(2)})</li>`).join("")}
+                            </ul>
+                        </li>
+                    `;
+                });
+                html += "</ul>";
+                document.getElementById("history").innerHTML = html;
+            });
+    }
+    
+    // 🔟 Print the bill
+    function printBill() {
+      // Get bill details
+      const totalAmount = document.getElementById('totalAmount').innerText;
+      const discount = document.getElementById('discount').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      
+      const items = [];
+      document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
+        const product = row.querySelector(".product option:checked").innerText;
+        const variant = row.querySelector(".variant option:checked").innerText;
+        const qty = row.cells[3].children[0].value;
+        const price = row.cells[4].children[0].value;
+        const subtotal = row.querySelector(".subtotal").innerText;
+        items.push({ product, variant, qty, price, subtotal });
+      });
+
+      // Create a new window for printing
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write('<html><head><title>Bill Receipt</title>');
+      printWindow.document.write('<style>');
+      printWindow.document.write(`
+        body { font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.5; padding: 20px; }
+        .receipt { width: 300px; margin: 0 auto; border: 1px dashed #333; padding: 15px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .item-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .item-table th, .item-table td { border-bottom: 1px solid #ccc; padding: 5px; text-align: left; }
+        .totals { margin-top: 10px; text-align: right; }
+        .totals div { padding: 3px 0; }
+        .footer { text-align: center; margin-top: 20px; font-style: italic; }
+      `);
+      printWindow.document.write('</style></head><body>');
+      printWindow.document.write('<div class="receipt">');
+      printWindow.document.write('<div class="header"><h3>COLLEENS Boutique</h3><p>Near Appas Theatre, West Nada, Guruvayoor, Thrissur, Kerala 680101</p><p>Date: ' + new Date().toLocaleDateString() + '</p></div>');
+      
+      printWindow.document.write('<table class="item-table">');
+      printWindow.document.write('<thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>');
+      printWindow.document.write('<tbody>');
+      items.forEach(item => {
+        printWindow.document.write(`<tr><td>${item.product}</td><td>${item.qty}</td><td>₹${parseFloat(item.price).toFixed(2)}</td><td>₹${parseFloat(item.subtotal).toFixed(2)}</td></tr>`);
+      });
+      printWindow.document.write('</tbody></table>');
+
+      printWindow.document.write('<div class="totals">');
+      printWindow.document.write(`<div><strong>Total:</strong> ₹${totalAmount}</div>`);
+      printWindow.document.write(`<div><strong>Discount:</strong> ₹${parseFloat(discount).toFixed(2)}</div>`);
+      printWindow.document.write(`<div><strong>Payment Method:</strong> ${paymentMethod}</div>`);
+      printWindow.document.write('</div>');
+
+      printWindow.document.write('<div class="footer"><p>Thank you for your business!</p></div>');
+      printWindow.document.write('</div>');
+      printWindow.document.write('</body></html>');
+      
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+
+
+    window.onload = addRow; // Add the first row on page load
+</script>
+
+</body>
+</html>
+{% endblock %}
