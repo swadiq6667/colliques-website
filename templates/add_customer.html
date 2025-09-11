@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% block title %}Add Customer{% endblock %}
+{% block page_title %}Add Customer{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">Add Customer</li>
+{% endblock %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        .section-card {
+            transition: all 0.3s ease;
+        }
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .floating-label {
+            transition: all 0.3s ease;
+        }
+        .form-group:focus-within .floating-label {
+            transform: translateY(-25px) scale(0.85);
+            color: #667eea;
+        }
+        .form-group input:not(:placeholder-shown) + .floating-label {
+            transform: translateY(-25px) scale(0.85);
+            color: #667eea;
+        }
+    </style>
+</head>
+
+<body class="gradient-bg min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-4">
+                <i class="fas fa-user-plus text-3xl text-purple-600"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Add New Customer</h1>
+            <p class="text-purple-100 text-lg">Create a new customer profile with detailed information</p>
+        </div>
+
+        <!-- Main Form Container -->
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-effect rounded-2xl shadow-2xl p-8">
+                <form method="POST" class="space-y-8" id="customerForm">
+                    {% csrf_token %}
+
+                    <!-- Customer Information Section -->
+                    <div class="section-card bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-blue-500 rounded-full p-3 mr-4">
+                                <i class="fas fa-user text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">Customer Information</h3>
+                                <p class="text-gray-600">Basic details about the customer</p>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Username Field -->
+                            <div class="form-group relative">
+                                <input type="text" name="username" id="username" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Username" required>
+                                <label for="username" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-user-circle mr-2"></i>Username
+                                </label>
+                            </div>
+
+                            <!-- First Name Field -->
+                            <div class="form-group relative">
+                                <input type="text" name="first_name" id="first_name" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="First Name">
+                                <label for="first_name" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-user-tag mr-2"></i>First Name
+                                </label>
+                            </div>
+
+                            <!-- Last Name Field -->
+                            <div class="form-group relative">
+                                <input type="text" name="last_name" id="last_name" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Last Name">
+                                <label for="last_name" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-user-tag mr-2"></i>Last Name
+                                </label>
+                            </div>
+
+                            <!-- Email Field -->
+                            <div class="form-group relative">
+                                <input type="email" name="email" id="email" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Email Address" required>
+                                <label for="email" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-envelope mr-2"></i>Email Address
+                                </label>
+                            </div>
+
+                            <!-- Phone Field -->
+                            <div class="form-group relative">
+                                <input type="tel" name="phone_number" id="phone_number" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Phone Number">
+                                <label for="phone_number" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-phone mr-2"></i>Phone Number
+                                </label>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group relative md:col-span-2">
+                                <input type="password" name="password" id="password" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Password" required>
+                                <label for="password" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-lock mr-2"></i>Password
+                                </label>
+                                <button type="button" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="passwordToggle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Information Section -->
+                    <div class="section-card bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-green-500 rounded-full p-3 mr-4">
+                                <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">Address Information</h3>
+                                <p class="text-gray-600">Optional address details (leave blank if not needed)</p>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Address Line -->
+                            <div class="form-group relative md:col-span-2">
+                                <input type="text" name="address_line" id="address_line" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Street Address">
+                                <label for="address_line" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-road mr-2"></i>Street Address
+                                </label>
+                            </div>
+
+                            <!-- City -->
+                            <div class="form-group relative">
+                                <input type="text" name="city" id="city" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="City">
+                                <label for="city" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-city mr-2"></i>City
+                                </label>
+                            </div>
+
+                            <!-- Postal Code -->
+                            <div class="form-group relative">
+                                <input type="text" name="postal_code" id="postal_code" 
+                                       class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-gray-700 placeholder-transparent" 
+                                       placeholder="Postal Code">
+                                <label for="postal_code" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">
+                                    <i class="fas fa-mail-bulk mr-2"></i>Postal Code
+                                </label>
+                            </div>
+
+                            <!-- Country -->
+                            <div class="form-group relative">
+                                <select name="country" id="country" 
+                                        class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-gray-700">
+                                    <option value="">Select Country</option>
+                                    <option value="IN">India</option>
+                                    <option value="US">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                    <!-- Add more countries as needed -->
+                                </select>
+                                <label for="country" class="absolute left-4 -top-2 bg-white px-1 text-sm text-gray-500">
+                                    <i class="fas fa-globe mr-1"></i>Country
+                                </label>
+                            </div>
+
+                            <!-- Address Type -->
+                            <div class="form-group relative">
+                                <select name="address_type" id="address_type" 
+                                        class="input-focus w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-gray-700">
+                                    <option value="">Select Type</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Work">Work</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <label for="address_type" class="absolute left-4 -top-2 bg-white px-1 text-sm text-gray-500">
+                                    <i class="fas fa-tag mr-1"></i>Address Type
+                                </label>
+                            </div>
+
+                            <!-- Default Address Checkbox -->
+                            <div class="md:col-span-2">
+                                <label class="flex items-center cursor-pointer bg-white rounded-lg p-3 border border-gray-200 hover:border-green-300">
+                                    <input type="checkbox" name="is_default" class="form-checkbox h-5 w-5 text-green-500 rounded focus:ring-green-400 focus:ring-2">
+                                    <span class="ml-3 text-gray-700 font-medium">
+                                        <i class="fas fa-star text-yellow-500 mr-2"></i>Set as default address
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-4 pt-6">
+                        <button type="button" 
+                                class="px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-all duration-300 flex items-center">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button type="submit" 
+                                class="btn-hover px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg flex items-center shadow-lg">
+                            <i class="fas fa-save mr-2"></i>Save Customer
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success/Error Messages -->
+                {% if messages %}
+                    <div class="mt-6">
+                        {% for message in messages %}
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center animate-pulse">
+                                <i class="fas fa-check-circle text-green-500 mr-3 text-xl"></i>
+                                <span class="font-semibold">{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
+        }
+
+        // Form validation and smooth animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('customerForm');
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.closest('.section-card').style.transform = 'translateY(-5px)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.closest('.section-card').style.transform = 'translateY(0)';
+                });
+            });
+
+            // Form submission with loading state
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+                submitBtn.disabled = true;
+                
+                // Re-enable button after 3 seconds if form doesn't actually submit
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 3000);
+            });
+        });
+
+        // Add floating label animation
+        document.querySelectorAll('.form-group input').forEach(input => {
+            if (input.value) {
+                input.nextElementSibling.style.transform = 'translateY(-25px) scale(0.85)';
+                input.nextElementSibling.style.color = '#667eea';
+            }
+        });
+    </script>
+</body>
+
+{% endblock %}
+

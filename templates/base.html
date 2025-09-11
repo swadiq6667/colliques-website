@@ -454,9 +454,9 @@
                     <span>Customers</span>
                 </a>
                 <ul class="submenu" id="users-menu">
-                    <li><a href="{#}" class="sidebar-link">List Customers</a></li>
-                    <li><a href="{#}" class="sidebar-link">Add Customer</a></li>
-                    <li><a href="{% url 'Address' %}" class="sidebar-link">Customer Address</a></li>
+                    <li><a href="{% url 'customer_list' %}" class="sidebar-link">List Customers</a></li>
+                    <li><a href="{%url 'add_customer' %}" class="sidebar-link">Add Customer</a></li>
+                    <li><a href="{% url 'address_list' %}" class="sidebar-link">Customer Address</a></li>
                 </ul>
             </li>
             <li class="sidebar-item">

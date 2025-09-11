@@ -48,6 +48,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)   # Required for Django admin
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
+    profile_image = models.ImageField(upload_to="user_profiles/", blank=True, null=True)
 
     objects = MyUserManager()
 
@@ -60,14 +61,15 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 # Extra model for customers only
 class CustomerProfile(models.Model):
-    user = models.OneToOneField("MyUser", on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField("MyUser", on_delete=models.CASCADE, related_name="profile", null=True, blank=True)
     customer_name = models.CharField(max_length=150, blank=True)
     customer_email = models.EmailField(unique=True, null=True, blank=True)
     customer_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.customer_id} - {self.user.username}"
+        username = self.user.username if self.user else "NoUser"
+        return f"{self.customer_id} - {username}"
 
 
 class Address(models.Model):

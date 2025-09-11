@@ -1,11 +1,10 @@
-{% extends 'base.html' %}
-{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Billing</title>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -107,6 +106,10 @@
 <div class="container">
     <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Shop Billing System</h1>
 
+    <a href="javascript:history.back()" class="back-button">
+        ← Back
+    </a>
+
     <!-- Custom Alert Message Display -->
     <div id="custom-alert" class="hidden"></div>
 
@@ -116,7 +119,21 @@
         <input type="text" id="phone" placeholder="Enter Phone Number" class="flex-grow">
         <button onclick="lookupCustomer()" class="w-full sm:w-auto">Search</button>
     </div>
+
     <div id="customerInfo" class="p-4 bg-gray-100 rounded-lg text-gray-700"></div>
+    <h2 class="text-2xl">📝 Register Customer</h2>
+<div id="registerForm" class="p-4 bg-gray-100 rounded-lg text-gray-700 hidden">
+    <form id="customerRegisterForm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input type="text" name="customer_name" placeholder="Full Name" required class="p-2 border rounded-lg">
+            <input type="email" name="customer_email" placeholder="Email" class="p-2 border rounded-lg">
+            <input type="text" name="phone_number" placeholder="Phone Number" required class="p-2 border rounded-lg">
+        </div>
+        <button type="button" onclick="registerCustomer()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+            ✅ Register
+        </button>
+    </form>
+</div>
 
     <!-- 🛒 Add Items -->
     <h2 class="text-2xl">🛒 Add Items</h2>
@@ -178,25 +195,89 @@
 
     // 1️⃣ Lookup Customer
     function lookupCustomer() {
-        const phone = document.getElementById("phone").value;
-        fetch(window.location.origin + `/customer-lookup/?phone=${phone}`)
-            .then(res => res.json())
-            .then(data => {
-                const customerInfoDiv = document.getElementById("customerInfo");
-                if (data.exists) {
-                    customerId = data.id;
-                    customerInfoDiv.innerHTML =
-                        `Customer Found: <b>${data.name}</b> (${data.email || "No Email"})`;
-                    loadHistory();
-                } else {
-                    customerId = null;
-                    customerInfoDiv.innerHTML =
-                        "❌ No customer found. Please register manually.";
-                    document.getElementById("history").innerHTML = "";
-                }
-            });
+    const phone = document.getElementById("phone").value.trim();
+    if (!phone) {
+        showMessage("Enter a phone number!");
+        return;
     }
 
+    // Reset previous customer info
+    customerId = null;
+    document.getElementById("customerInfo").innerHTML = "";
+    document.getElementById("history").innerHTML = "";
+
+    fetch(window.location.origin + `/customer_lookup/?phone=${phone}`)
+        .then(res => res.json())
+        .then(data => {
+            const customerInfoDiv = document.getElementById("customerInfo");
+            if (data.exists) {
+                customerId = data.id;
+                customerInfoDiv.innerHTML =
+                    `Customer Found: <b>${data.name}</b> (${data.email || "No Email"})`;
+                document.getElementById("registerForm").classList.add("hidden");
+                loadHistory();
+            } else {
+                customerId = null;
+                customerInfoDiv.innerHTML =
+                    "❌ No customer found. Please register manually.";
+                document.getElementById("registerForm").classList.remove("hidden");
+                // Clear form fields when registering a new customer
+                document.getElementById("customerRegisterForm").reset();
+            }
+        });
+}
+
+function registerCustomer() {
+    const phoneInput = document.getElementById("phone").value.trim();
+    const form = document.getElementById("customerRegisterForm");
+    form.phone_number.value = phoneInput; // Ensure the form has the correct phone
+
+    const formData = new FormData(form);
+
+    fetch(window.location.origin + "/register_customer/", {
+        method: "POST",
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            customerId = data.id;
+            showMessage("✅ Customer Registered Successfully!");
+            document.getElementById("registerForm").classList.add("hidden");
+            document.getElementById("customerInfo").innerHTML =
+                `✅ Customer Registered: <b>${data.name}</b> (${data.email || "No Email"})`;
+            loadHistory();
+        } else if (data.message) {
+            // Existing customer case
+            customerId = data.id;
+            showMessage(`⚠ ${data.message}`);
+            document.getElementById("registerForm").classList.add("hidden");
+            document.getElementById("customerInfo").innerHTML =
+                `Customer Already Exists: <b>${data.name}</b> (${data.email || "No Email"})`;
+            loadHistory();
+        } else {
+            showMessage("❌ Registration failed. " + JSON.stringify(data.errors));
+        }
+    });
+}
+
+
+// ✅ Move this outside of registerCustomer
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
     // 2️⃣ Add new item row
     function addRow() {
         const table = document.querySelector("#itemsTable tbody");
@@ -341,7 +422,7 @@
             items: items
         };
 
-        fetch(window.location.origin + "/create-bill/", {
+        fetch(window.location.origin + "/create_bill/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -358,7 +439,7 @@
 
     // 9️⃣ Load customer history
     function loadHistory() {
-        fetch(window.location.origin + `/customer-history/${customerId}/`)
+        fetch(window.location.origin + `/customer_history/${customerId}/`)
             .then(res => res.json())
             .then(data => {
                 let html = `
@@ -446,4 +527,3 @@
 
 </body>
 </html>
-{% endblock %}

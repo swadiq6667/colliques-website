@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Custom CSS for a cleaner look */
+    .table-custom-header th {
+        background-color: #343a40; /* Dark background for table header */
+        color: white; /* White text for contrast */
+        border-color: #454d55;
+    }
+
+    .table-custom-row td {
+        vertical-align: middle; /* Center content vertically */
+    }
+
+    /* Style for the avatar when no profile image exists */
+    .avatar-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%; /* Make it a perfect circle */
+        background-color: #0d6efd; /* A nice blue color */
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1.25rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Customer List</h4>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-custom-header">
+                        <tr>
+                            <th scope="col">Profile</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr class="table-custom-row">
+                            <td>
+                                {% if customer.profile_image %}
+                                    <img src="{{ customer.profile_image.url }}" alt="{{ customer.customer_name }}" class="img-fluid rounded-circle" width="48" height="48">
+                                {% else %}
+                                    <div class="avatar-circle">
+                                        {{ customer.user.first_name|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ customer.user.first_name }} {{ customer.user.last_name }}</td>
+                            <td>{{ customer.customer_email }}</td>
+                            <td>{{ customer.phone_number }}</td>
+                            <td>{{ customer.user.username }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Customer Actions">
+                                    <a href="{% url 'view_customer' customer.id %}" class="btn btn-primary btn-sm">View</a>
+                                    <a href="{% url 'edit_customer' customer.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                                    {% if customer.user.is_active %}
+                                        <a href="{% url 'deactivate_customer' customer.id %}" class="btn btn-danger btn-sm">Deactivate</a>
+                                    {% else %}
+                                        <a href="{% url 'activate_customer' customer.id %}" class="btn btn-success btn-sm">Activate</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No customers found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

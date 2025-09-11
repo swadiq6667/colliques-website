@@ -2,8 +2,40 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from shop.models import CustomerProfile, Bill, BillItem, Product, ProductVariant
 
+from django.http import JsonResponse
+from shop.forms import CustomerRegisterForm
+
+
+def register_customer(request):
+    if request.method == "POST":
+        phone = request.POST.get("phone_number")
+        # Check if customer with this phone already exists
+        if CustomerProfile.objects.filter(phone_number=phone).exists():
+            customer = CustomerProfile.objects.get(phone_number=phone)
+            return JsonResponse({
+                "success": False,
+                "message": "Customer with this phone number already exists!",
+                "id": customer.id,
+                "name": customer.customer_name,
+                "email": customer.customer_email
+            })
+
+        form = CustomerRegisterForm(request.POST)
+        if form.is_valid():
+            customer = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": customer.id,
+                "name": customer.customer_name,
+                "email": customer.customer_email
+            })
+        else:
+            return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse({"success": False, "errors": "Invalid request"})
+
 def billing_page(request):
-    return render(request, "bill.html")
+    form = CustomerRegisterForm()
+    return render(request, "bill.html", {"register_form": form})
 
 def customer_lookup(request):
     phone = request.GET.get("phone")
@@ -74,11 +106,11 @@ def create_bill(request):
     bill.save()
 
     return JsonResponse({
-        "bill_id": bill.id,
-        "customer": bill.customer.customer_name,
-        "total_amount": bill.total_amount,
-        "items": bill.items.count()
-    })
+    "bill_id": bill.id,
+    "customer": bill.customer.customer_name,
+    "total_amount": float(bill.total_amount),   # ✅ ensures it's a number
+    "items": bill.items.count()
+})
 
 
 def customer_history(request, customer_id):
@@ -134,3 +166,4 @@ def variant_list(request):
     product_id = request.GET.get("product")
     variants = ProductVariant.objects.filter(product_id=product_id).values("id", "color", "size", "price")
     return JsonResponse(list(variants), safe=False)
+

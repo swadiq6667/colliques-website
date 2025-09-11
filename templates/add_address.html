@@ -234,12 +234,12 @@
 <div class="container">
     <div class="header-content">
         <h1>{% if address %}Edit{% else %}Add{% endif %} Customer Address</h1>
-        <a href="#" class="nav-link">View All Addresses</a>
+        <a href="{% url 'address_list' %}" class="nav-link">View All Addresses</a>
     </div>
-    
+
     {% if messages %}
         {% for message in messages %}
-            <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}" style="display: block;">
+            <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}" style="display:block;">
                 {{ message }}
             </div>
         {% endfor %}
@@ -251,66 +251,69 @@
 
     <form method="post" id="addressForm">
         {% csrf_token %}
-        
+
+        <!-- Address Type -->
         <div class="form-group">
             <label>Address Type</label>
             <div class="address-type">
                 <div class="radio-group">
-                    <input type="radio" id="home" name="address_type" value="Home" 
-                            {% if not address or address.address_type == 'Home' %}checked{% endif %}>
+                    <input type="radio" id="home" name="address_type" value="Home"
+                        {% if not address or address.address_type == 'Home' %}checked{% endif %}>
                     <label for="home">Home</label>
                 </div>
                 <div class="radio-group">
                     <input type="radio" id="work" name="address_type" value="Work"
-                            {% if address.address_type == 'Work' %}checked{% endif %}>
+                        {% if address and address.address_type == 'Work' %}checked{% endif %}>
                     <label for="work">Work</label>
                 </div>
                 <div class="radio-group">
                     <input type="radio" id="other" name="address_type" value="Other"
-                            {% if address.address_type == 'Other' %}checked{% endif %}>
+                        {% if address and address.address_type == 'Other' %}checked{% endif %}>
                     <label for="other">Other</label>
                 </div>
             </div>
         </div>
 
+        <!-- Customer Selection -->
         <div class="form-group">
-            <label for="customer">Customer <span class="required">*</span></label>
+            <label for="customerFilter">Select Customer</label>
             {% if customers %}
-            <select id="customer" name="customer" class="form-control" required {% if address %}disabled{% endif %}>
-                <option value="" disabled {% if not address %}selected{% endif %}>Select a Customer</option>
-                {% for customer in customers %}
-                    <option value="{{ customer.id }}" 
-                            data-email="{{ customer.customer_email|default:'' }}"
-                            data-phone="{{ customer.phone_number|default:'' }}"
-                            {% if address and address.customer.id == customer.id %}selected{% endif %}>
-                        {{ customer.customer_name }} ({{ customer.customer_email|default:'No email' }})
-                    </option>
-                {% endfor %}
-            </select>
-            {% if address %}
-                <input type="hidden" name="customer" value="{{ address.customer.id }}">
-            {% endif %}
+                <select id="customerFilter" name="customer" class="form-control" required>
+                    <option value="">-- Select Customer --</option>
+                    {% for c in customers %}
+                        <option value="{{ c.id }}"
+                            {% if address and address.customer.id == c.id %}selected{% endif %}>
+                            {{ c.customer_name }} ({{ c.customer_email|default:"No email" }})
+                        </option>
+                    {% endfor %}
+                </select>
             {% else %}
-            <input type="text" class="form-control" value="No customers found. Please create a customer profile first." disabled>
-            <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
-                <a href="#" style="color: #667eea;">Create Customer Profile</a>
-            </p>
+                <input type="text" class="form-control"
+                       value="No customers found. Please create a customer profile first."
+                       disabled>
+                <p style="color:#666;font-size:0.9rem;margin-top:5px;">
+                    <a href="{% url 'register_customer' %}" style="color:#667eea;">Create Customer Profile</a>
+                </p>
             {% endif %}
         </div>
 
+        <!-- Address Fields -->
         <div class="form-group">
             <label for="addressLine">Address Line <span class="required">*</span></label>
-            <textarea id="addressLine" name="address_line" placeholder="Complete address including street, area, landmarks" required rows="3">{% if address %}{{ address.address_line }}{% endif %}</textarea>
+            <textarea id="addressLine" name="address_line" required rows="3"
+                placeholder="Complete address including street, area, landmarks">{% if address %}{{ address.address_line }}{% endif %}</textarea>
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="city">City <span class="required">*</span></label>
-                <input type="text" id="city" name="city" value="{% if address %}{{ address.city }}{% endif %}" required>
+                <input type="text" id="city" name="city"
+                       value="{% if address %}{{ address.city }}{% endif %}" required>
             </div>
             <div class="form-group">
                 <label for="postalCode">Postal Code <span class="required">*</span></label>
-                <input type="text" id="postalCode" name="postal_code" value="{% if address %}{{ address.postal_code }}{% endif %}" required>
+                <input type="text" id="postalCode" name="postal_code"
+                       value="{% if address %}{{ address.postal_code }}{% endif %}" required>
             </div>
         </div>
 
@@ -319,31 +322,28 @@
             <select id="country" name="country" class="form-control" required>
                 <option value="">Select Country</option>
                 <option value="India" {% if not address or address.country == 'India' %}selected{% endif %}>India</option>
-                <option value="United States" {% if address.country == 'United States' %}selected{% endif %}>United States</option>
-                <option value="Canada" {% if address.country == 'Canada' %}selected{% endif %}>Canada</option>
-                <option value="United Kingdom" {% if address.country == 'United Kingdom' %}selected{% endif %}>United Kingdom</option>
-                <option value="Australia" {% if address.country == 'Australia' %}selected{% endif %}>Australia</option>
+                <option value="United States" {% if address and address.country == 'United States' %}selected{% endif %}>United States</option>
+                <option value="Canada" {% if address and address.country == 'Canada' %}selected{% endif %}>Canada</option>
+                <option value="United Kingdom" {% if address and address.country == 'United Kingdom' %}selected{% endif %}>United Kingdom</option>
+                <option value="Australia" {% if address and address.country == 'Australia' %}selected{% endif %}>Australia</option>
             </select>
         </div>
 
         <div class="form-group">
             <div class="radio-group">
-                <input type="checkbox" id="isDefault" name="is_default" value="true" 
-                        {% if address.is_default %}checked{% endif %}>
+                <input type="checkbox" id="isDefault" name="is_default" value="true"
+                       {% if address and address.is_default %}checked{% endif %}>
                 <label for="isDefault">Set as default address</label>
             </div>
         </div>
 
+        <!-- Buttons -->
         <div class="btn-container">
-            <a href="#" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'address_list' %}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">
                 {% if address %}Update Address{% else %}Save Address{% endif %}
             </button>
         </div>
     </form>
 </div>
-
-<script>
-    // Existing script remains the same
-</script>
 {% endblock %}

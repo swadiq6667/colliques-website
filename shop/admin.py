@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (MyUser, CustomerProfile, Address,Category, Product, ProductVariant,Cart, CartItem, Order, OrderItem)
+from .models import (MyUser, CustomerProfile, Address,Category, Product, ProductVariant,Cart, CartItem, Order, OrderItem, Bill, BillItem)
 
 
 # --------------------
@@ -96,3 +96,16 @@ class OrderAdmin(admin.ModelAdmin):
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ("order", "product", "variant", "quantity", "price", "total_price")
     search_fields = ("product__name", "variant__color", "variant__size")
+
+class BillItemInline(admin.TabularInline):  # or StackedInline for full view
+    model = BillItem
+    extra = 1  # show 1 empty row for adding new items
+    fields = ("product", "variant", "quantity", "price", "subtotal")
+    readonly_fields = ("subtotal",)
+
+@admin.register(Bill)
+class BillAdmin(admin.ModelAdmin):
+    list_display = ("id", "customer", "date", "total_amount", "payment_method")
+    list_filter = ("payment_method", "date")
+    search_fields = ("customer__customer_name", "customer__user__username")
+    inlines = [BillItemInline]

@@ -27,7 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+# Twilio WhatsApp Configuration
+TWILIO_ACCOUNT_SID = 'ACcd4b278d1a3c2ea4379194397a3a9ab5'
+TWILIO_AUTH_TOKEN = 'e637c78834fc28981839c087e1ac56a7'
+TWILIO_WHATSAPP_NUMBER = 'whatsapp:+917025970874'  # Twilio sandbox number
 # Application definition
 
 INSTALLED_APPS = [
