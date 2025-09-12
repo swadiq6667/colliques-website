@@ -278,15 +278,15 @@
         <div class="form-group">
             <label for="customerFilter">Select Customer</label>
             {% if customers %}
-                <select id="customerFilter" name="customer" class="form-control" required>
-                    <option value="">-- Select Customer --</option>
-                    {% for c in customers %}
-                        <option value="{{ c.id }}"
-                            {% if address and address.customer.id == c.id %}selected{% endif %}>
-                            {{ c.customer_name }} ({{ c.customer_email|default:"No email" }})
-                        </option>
-                    {% endfor %}
-                </select>
+            <select id="customerFilter" name="customer" class="form-control" required>
+                <option value="">-- Select Customer --</option>
+                {% for c in customers %}
+                    <option value="{{ c.id }}"
+                        {% if address and address.customer.id == c.id %}selected{% endif %}>
+                        {{ c.customer_name }} ({{ c.customer_email|default:"No email" }})
+                    </option>
+                {% endfor %}
+            </select>
             {% else %}
                 <input type="text" class="form-control"
                        value="No customers found. Please create a customer profile first."
